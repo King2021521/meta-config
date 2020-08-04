@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"configservice"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
@@ -15,6 +14,10 @@ type mgo struct {
 	uri        string //数据库网络地址
 	database   string //要连接的数据库
 	collection string //要连接的集合
+}
+
+type MongoTemplate struct {
+	collection *mongo.Collection
 }
 
 func (m *mgo) Connect() (*mongo.Collection, error) {
@@ -31,8 +34,8 @@ func (m *mgo) Connect() (*mongo.Collection, error) {
 /**
  * 插入数据
  */
-func (m *mgo) Insert(collection *mongo.Collection, user configservice.Userspace) (interface{}, error) {
-	insertResult, err := collection.InsertOne(context.TODO(), user)
+func (t *MongoTemplate) Insert(document interface{}) (interface{}, error) {
+	insertResult, err := t.collection.InsertOne(context.TODO(), document)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -45,9 +48,9 @@ func (m *mgo) Insert(collection *mongo.Collection, user configservice.Userspace)
 /**
  * 查询数据
  */
-func (m *mgo) Query(collection *mongo.Collection, filter bson.D) (interface{}, error) {
-	var result configservice.Userspace
-	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+func (t *MongoTemplate) Query(filter bson.D) (interface{}, error) {
+	var result interface{}
+	err := t.collection.FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
@@ -59,8 +62,21 @@ func (m *mgo) Query(collection *mongo.Collection, filter bson.D) (interface{}, e
 /**
  * 更新数据
  */
-func (m *mgo) Update(collection *mongo.Collection, filter bson.D) (interface{}, error) {
-	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
+func (t *MongoTemplate) Update(filter bson.D, update bson.D) (interface{}, error) {
+	updateResult, err := t.collection.UpdateOne(context.TODO(), filter, update)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+	fmt.Printf("Matched %v documents and updated %v documents.\n", updateResult.MatchedCount, updateResult.ModifiedCount)
+	return updateResult.ModifiedCount, nil
+}
+
+/**
+ * 删除数据
+ */
+func (t *MongoTemplate) Delete(filter bson.D) (interface{}, error) {
+	deleteResult, err := t.collection.DeleteOne(context.TODO(), filter)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
