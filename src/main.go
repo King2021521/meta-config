@@ -1,6 +1,8 @@
 package main
 
-import ()
+import (
+	"portal"
+)
 
 func main() {
 	/*client, _ := storage.Connect()
@@ -8,4 +10,5 @@ func main() {
 	//insert(client, user)
 	collection := client.Database("meta-config").Collection("user_space")
 	storage.Query(collection, bson.D{{"uid", "u123"}})*/
+	portal.WebServer()
 }

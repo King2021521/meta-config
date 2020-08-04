@@ -10,24 +10,24 @@ import (
 	"time"
 )
 
-type mgo struct {
-	uri        string //数据库网络地址
-	database   string //要连接的数据库
-	collection string //要连接的集合
+type Mgo struct {
+	Uri        string //数据库网络地址
+	Database   string //要连接的数据库
+	Collection string //要连接的集合
 }
 
 type MongoTemplate struct {
 	collection *mongo.Collection
 }
 
-func (m *mgo) Connect() (*mongo.Collection, error) {
+func (m *Mgo) Connect() (*mongo.Collection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(m.uri).SetMaxPoolSize(20))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(m.Uri).SetMaxPoolSize(20))
 	if err != nil {
 		log.Print(err)
 	}
-	collection := client.Database(m.database).Collection(m.collection)
+	collection := client.Database(m.Database).Collection(m.Collection)
 	return collection, nil
 }
 
