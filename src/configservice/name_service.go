@@ -32,8 +32,14 @@ type Userspace struct {
 	Role string
 	//readOnly、read/write
 	Authority string
-	//命名空间集合
-	Group  []string
+	Create    time.Time
+	Modify    time.Time
+}
+
+//用户命名空间绑定关系
+type Binding struct {
+	Uid    string
+	Appid  string
 	Create time.Time
 	Modify time.Time
 }
