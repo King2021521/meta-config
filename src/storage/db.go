@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"log"
 	"time"
 )
@@ -85,4 +86,13 @@ func (t *MongoTemplate) Delete(filter bson.D) (interface{}, error) {
 	}
 	fmt.Printf("Deleted %v documents in the trainers collection\n", deleteResult.DeletedCount)
 	return deleteResult, nil
+}
+
+//设置索引的过期时间
+func (t *MongoTemplate) Expire() (interface{}, error) {
+	k := mongo.IndexModel{
+		Keys:    bsonx.Doc{{"expire", bsonx.Int32(1)}},
+		Options: options.Index().SetExpireAfterSeconds(1 * 60 * 60), //一小时后过期
+	}
+	return t.collection.Indexes().CreateOne(context.TODO(), k)
 }
