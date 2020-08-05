@@ -20,6 +20,15 @@ type MongoTemplate struct {
 	collection *mongo.Collection
 }
 
+func NewMongoTemplate(mgo *Mgo) *MongoTemplate {
+	collection, _ := mgo.Connect()
+	return &MongoTemplate{collection: collection}
+}
+
+func (t *MongoTemplate) GetCollection() *mongo.Collection {
+	return t.collection
+}
+
 func (m *Mgo) Connect() (*mongo.Collection, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -46,17 +55,10 @@ func (t *MongoTemplate) Insert(document interface{}) (interface{}, error) {
 }
 
 /**
- * 查询数据
+ * 查询单条数据
  */
-func (t *MongoTemplate) Query(filter bson.D) (interface{}, error) {
-	var result interface{}
-	err := t.collection.FindOne(context.TODO(), filter).Decode(&result)
-	if err != nil {
-		log.Fatal(err)
-		return nil, err
-	}
-	fmt.Printf("Found a single document: %+v\n", result)
-	return result, nil
+func (t *MongoTemplate) Query(filter bson.D) *mongo.SingleResult {
+	return t.collection.FindOne(context.TODO(), filter)
 }
 
 /**

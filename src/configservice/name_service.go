@@ -27,7 +27,8 @@ type Metaspace struct {
 
 //用户空间
 type Userspace struct {
-	Uid string
+	Uid      string
+	Password string
 	//角色：SuperStar、Admin、Leader、Follower
 	Role string
 	//readOnly、read/write

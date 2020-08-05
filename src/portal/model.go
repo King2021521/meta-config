@@ -9,9 +9,9 @@ type LoginRequest struct {
 }
 
 //登陆响应结果
-type LoginResponse struct {
+type CommonResponse struct {
 	Code      int
-	Data      *LoginDataResponse
+	Data      interface{}
 	Timestamp time.Time
 	Message   string
 }
